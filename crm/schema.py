@@ -102,6 +102,13 @@ class CreateCustomer(graphene.Mutation):
                 message="Failed to create customer.",
                 errors=errors,
             )
+        
+        customer = Customer(
+            name=name,
+            email=email,
+            phone=phone,
+        )
+        customer.save()
 
         customer = Customer.objects.create(name=name, email=email, phone=phone)
         return CreateCustomer(
