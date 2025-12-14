@@ -2,11 +2,15 @@ import re
 from decimal import Decimal
 
 import graphene
+from graphene import relay
 from django.db import transaction
 from django.utils import timezone
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import Customer, Product, Order
+from .filters import CustomerFilter, ProductFilter, OrderFilter
+
 
 
 # =====================
@@ -16,19 +20,26 @@ from .models import Customer, Product, Order
 class CustomerType(DjangoObjectType):
     class Meta:
         model = Customer
+        interfaces = (relay.Node,)
+        filterset_class = CustomerFilter
         fields = ("id", "name", "email", "phone", "created_at")
 
 
 class ProductType(DjangoObjectType):
     class Meta:
         model = Product
-        fields = ("id", "name", "price", "stock", "created_at")
+        interfaces = (relay.Node,)
+        filterset_class = ProductFilter
+        fields = ("id", "name", "price", "stock")
 
 
 class OrderType(DjangoObjectType):
     class Meta:
         model = Order
+        interfaces = (relay.Node,)
+        filterset_class = OrderFilter
         fields = ("id", "customer", "products", "total_amount", "order_date")
+
 
 
 # =====================
