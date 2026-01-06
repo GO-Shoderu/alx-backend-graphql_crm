@@ -6,23 +6,26 @@ PYTHON="/home/gosh/Documents/alx/be/alx-backend-graphql_crm/.venv/bin/python"
 MANAGE_PY="$PROJECT_DIR/manage.py"
 LOG_FILE="/tmp/customer_cleanup_log.txt"
 
-# Run Django shell command
 DELETED_COUNT=$(
-  $PYTHON $MANAGE_PY shell <<EOF
+  $PYTHON $MANAGE_PY shell <<'EOF'
 from datetime import timedelta
 from django.utils import timezone
+from django.db.models import Max, Q
 from crm.models import Customer
 
 one_year_ago = timezone.now() - timedelta(days=365)
 
-deleted, _ = Customer.objects.filter(
-    orders__isnull=True,
-    created_at__lt=one_year_ago
-).delete()
+# Customers who have never ordered OR whose last order is older than 1 year
+qs = Customer.objects.annotate(
+    last_order=Max("orders__created_at")
+).filter(
+    Q(last_order__lt=one_year_ago) | Q(last_order__isnull=True)
+)
 
-print(deleted)
+count = qs.count()
+qs.delete()
+print(count)
 EOF
 )
 
-# Log result with timestamp
-echo "$(date '+%Y-%m-%d %H:%M:%S') - Deleted customers: $DELETED_COUNT" >> $LOG_FILE
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Deleted customers: $DELETED_COUNT" >> "$LOG_FILE"
