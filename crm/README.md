@@ -1,11 +1,9 @@
-# Celery Task for Generating CRM Reports
+# CRM Celery Setup
 
-## 1) Install Redis and dependencies
-Install Redis and ensure it is running locally.
+This project uses Celery + Celery Beat with Redis for scheduling background jobs.
 
-Broker:
-- redis://localhost:6379/0
+## Setup Instructions
 
-Install Python dependencies:
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
