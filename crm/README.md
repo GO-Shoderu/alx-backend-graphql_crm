@@ -1,53 +1,37 @@
-# CRM Celery Setup
+# Celery Task for Generating CRM Reports
 
-This project uses Celery + Celery Beat with Redis for scheduling background jobs.
+## Install Redis and dependencies
 
-## Setup Instructions
-
-### 1. Install Dependencies
-```bash
-# Ubuntu/Debian
-sudo apt update
-sudo apt install redis-server
-
-# MacOS (using Homebrew)
-brew install redis
-Start Redis service:
-
-sudo service redis-server start
+Ensure Redis is installed and running locally.
 
 Install Python dependencies:
+
+```bash
 pip install -r requirements.txt
+```
 
-2. Run Database Migrations
+## Run migrations
 
-Apply all Django migrations:
-
+```bash
 python manage.py migrate
+```
 
-3. Start Celery Worker
+## Start Celery worker
 
-Run the Celery worker for the CRM app:
-
+```bash
 celery -A crm worker -l info
+```
 
+## Start Celery Beat
 
-This will process background tasks for your CRM application.
-
-4. Start Celery Beat
-
-Start Celery Beat to handle scheduled tasks:
-
+```bash
 celery -A crm beat -l info
+```
 
+## Verify logs
 
-This will schedule periodic tasks defined in the CRM app.
+Check the generated CRM report log:
 
-5. Verify Logs
-
-Check the log file to ensure tasks are running properly:
-
+```bash
 cat /tmp/crm_report_log.txt
-
-
-You should see logs indicating that the heartbeat and scheduled tasks are being processed.
+```
