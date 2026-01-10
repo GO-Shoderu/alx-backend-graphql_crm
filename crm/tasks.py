@@ -1,8 +1,7 @@
 from datetime import datetime
 
+import requests
 from celery import shared_task
-from gql import gql, Client
-from gql.transport.requests import RequestsHTTPTransport
 
 
 @shared_task
@@ -15,38 +14,27 @@ def generate_crm_report():
     Logs to: /tmp/crm_report_log.txt
     Format: YYYY-MM-DD HH:MM:SS - Report: X customers, Y orders, Z revenue
     """
-    transport = RequestsHTTPTransport(
-        url="http://localhost:8000/graphql",
-        verify=True,
-        retries=2,
-        timeout=20,
-    )
-    client = Client(transport=transport, fetch_schema_from_transport=False)
-
-    query = gql(
-        """
-        query {
-          allCustomers { id }
-          allOrders { id totalAmount }
-        }
-        """
-    )
-
-    customers_count = 0
-    orders_count = 0
-    revenue = 0.0
+    url = "http://localhost:8000/graphql"
+    query = """
+    query {
+      allCustomers { id }
+      allOrders { id totalAmount }
+    }
+    """
 
     try:
-        result = client.execute(query) or {}
+        resp = requests.post(url, json={"query": query}, timeout=20)
+        resp.raise_for_status()
+        data = (resp.json() or {}).get("data") or {}
 
-        customers = result.get("allCustomers") or []
-        orders = result.get("allOrders") or []
+        customers = data.get("allCustomers") or []
+        orders = data.get("allOrders") or []
 
         customers_count = len(customers)
         orders_count = len(orders)
 
+        revenue = 0.0
         for o in orders:
-            # totalAmount may come as string/float depending on Graphene + Decimal
             val = o.get("totalAmount") or 0
             revenue += float(val)
 

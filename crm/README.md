@@ -1,8 +1,10 @@
-# Celery + Celery Beat CRM Reporting (Optional Task)
+# Celery Task for Generating CRM Reports
 
-## Install Redis and dependencies
-- Ensure Redis is installed and running on localhost:
-  - Broker URL used: redis://localhost:6379/0
+## 1) Install Redis and dependencies
+Install Redis and ensure it is running locally.
+
+Broker:
+- redis://localhost:6379/0
 
 Install Python dependencies:
 ```bash
