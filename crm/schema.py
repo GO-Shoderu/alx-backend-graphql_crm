@@ -113,7 +113,7 @@ class CreateCustomer(graphene.Mutation):
                 message="Failed to create customer.",
                 errors=errors,
             )
-        
+
         customer = Customer(
             name=name,
             email=email,
@@ -250,6 +250,35 @@ class CreateOrder(graphene.Mutation):
         return CreateOrder(order=order, errors=[])
 
 
+class UpdateLowStockProducts(graphene.Mutation):
+    """
+    Finds products with stock < 10, increments stock by 10 (restock simulation),
+    and returns updated products + a message.
+    """
+
+    updated_products = graphene.List(ProductType)
+    message = graphene.String()
+    success = graphene.Boolean()
+
+    @staticmethod
+    @transaction.atomic
+    def mutate(root, info):
+        low_stock_products = Product.objects.filter(stock__lt=10)
+
+        updated = []
+        for product in low_stock_products:
+            product.stock += 10
+            product.save(update_fields=["stock"])
+            updated.append(product)
+
+        return UpdateLowStockProducts(
+            updated_products=updated,
+            message=f"Updated {len(updated)} low-stock products.",
+            success=True,
+        )
+
+
+
 # =====================
 # Query
 # (can be extended in later tasks)
@@ -283,3 +312,4 @@ class Mutation(graphene.ObjectType):
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products = UpdateLowStockProducts.Field()

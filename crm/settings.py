@@ -24,4 +24,5 @@ INSTALLED_APPS = [
 # django-crontab configuration (required by checker)
 CRONJOBS = [
     ("*/5 * * * *", "crm.cron.log_crm_heartbeat"),
+    ("0 */12 * * *", "crm.cron.update_low_stock"),
 ]
