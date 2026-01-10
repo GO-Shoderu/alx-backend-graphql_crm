@@ -7,6 +7,19 @@ alx_backend_graphql/settings.py
 
 from alx_backend_graphql.settings import *  # noqa
 
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    "graphene_django",
+    "crm.apps.CrmConfig",
+    "django_filters",
+    "django_crontab",
+]
+
 
 # django-crontab configuration (required by checker)
 CRONJOBS = [
